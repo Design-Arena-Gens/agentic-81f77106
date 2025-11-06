@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منصة إدارة المهام المتطورة</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="parallax-layer layer-one" aria-hidden="true"></div>
+    <div class="parallax-layer layer-two" aria-hidden="true"></div>
+    <div class="app">
+      <header class="app__header">
+        <div class="branding">
+          <h1>منصة إدارة المهام</h1>
+          <p>إدارة متكاملة للمهام مع تركيز على الإنتاجية</p>
+        </div>
+        <div class="header-actions">
+          <button class="mode-toggle" id="modeToggle" aria-label="تبديل وضع الألوان"></button>
+          <button class="focus-toggle" id="focusToggle" aria-pressed="false">وضع التركيز</button>
+          <div class="timer" aria-live="polite">
+            <span id="timerDisplay">25:00</span>
+            <div class="timer-controls">
+              <button id="timerStart">ابدأ</button>
+              <button id="timerPause">إيقاف</button>
+              <button id="timerReset">إعادة</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="app__content">
+        <section class="task-creation" aria-labelledby="taskFormTitle">
+          <h2 id="taskFormTitle">إضافة مهمة جديدة</h2>
+          <form id="taskForm" novalidate>
+            <div class="form-grid">
+              <label>
+                <span>عنوان المهمة</span>
+                <input type="text" id="taskTitle" name="title" required autocomplete="off" />
+              </label>
+              <label>
+                <span>وصف المهمة</span>
+                <textarea id="taskDescription" name="description" rows="3"></textarea>
+              </label>
+              <label>
+                <span>تاريخ الاستحقاق</span>
+                <input type="date" id="taskDueDate" name="dueDate" />
+              </label>
+              <label>
+                <span>الأولوية</span>
+                <select id="taskPriority" name="priority">
+                  <option value="high">مرتفعة</option>
+                  <option value="medium" selected>متوسطة</option>
+                  <option value="low">منخفضة</option>
+                </select>
+              </label>
+              <label>
+                <span>الحالة</span>
+                <select id="taskStatus" name="status">
+                  <option value="todo" selected>قيد التخطيط</option>
+                  <option value="in-progress">قيد التنفيذ</option>
+                  <option value="done">منجزة</option>
+                </select>
+              </label>
+              <fieldset class="tags-field">
+                <legend>الوسوم</legend>
+                <div class="tags-input">
+                  <input type="text" id="tagInput" placeholder="أدخل الوسم ثم اضغط إدخال" />
+                  <input type="color" id="tagColor" value="#4c6ef5" title="لون الوسم" />
+                </div>
+                <div id="tagPreview" class="tags-preview" aria-live="polite"></div>
+              </fieldset>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="primary">حفظ المهمة</button>
+              <button type="reset" class="ghost" id="taskFormReset">إلغاء</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="controls" aria-label="أدوات التحكم">
+          <div class="filters">
+            <div class="control-group">
+              <label for="searchInput">بحث فوري</label>
+              <input type="search" id="searchInput" placeholder="ابحث عن مهمة" />
+            </div>
+            <div class="control-group">
+              <label for="filterPriority">حسب الأولوية</label>
+              <select id="filterPriority">
+                <option value="all">الكل</option>
+                <option value="high">مرتفعة</option>
+                <option value="medium">متوسطة</option>
+                <option value="low">منخفضة</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="filterStatus">حسب الحالة</label>
+              <select id="filterStatus">
+                <option value="all">الكل</option>
+                <option value="todo">قيد التخطيط</option>
+                <option value="in-progress">قيد التنفيذ</option>
+                <option value="done">منجزة</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="filterDate">حسب التاريخ</label>
+              <input type="date" id="filterDate" />
+            </div>
+            <div class="control-group">
+              <label for="filterTags">حسب الوسوم</label>
+              <select id="filterTags" multiple aria-describedby="filterTagsHint"></select>
+              <small id="filterTagsHint">استخدم CTRL/⌘ لتحديد عدة وسوم</small>
+            </div>
+          </div>
+          <div class="export-actions">
+            <button id="exportJSON">تصدير JSON</button>
+            <button id="exportCSV">تصدير CSV</button>
+          </div>
+        </section>
+
+        <section class="notifications" aria-live="polite">
+          <h2>الإشعارات</h2>
+          <div id="notificationList" class="notification-list" role="status"></div>
+        </section>
+
+        <section class="task-list" aria-labelledby="taskListTitle">
+          <div class="list-header">
+            <h2 id="taskListTitle">المهام</h2>
+            <span id="tasksCount" class="tasks-count" aria-live="polite"></span>
+          </div>
+          <div class="loading-state" id="loadingState">
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-item"></div>
+            <div class="skeleton skeleton-item"></div>
+            <div class="skeleton skeleton-item"></div>
+          </div>
+          <ul id="tasksContainer" class="tasks-container" aria-describedby="dragHint"></ul>
+          <p id="dragHint" class="drag-hint">يمكنك سحب المهام لإعادة ترتيبها</p>
+        </section>
+
+        <section class="analytics" aria-labelledby="analyticsTitle">
+          <h2 id="analyticsTitle">إحصائيات الإنجاز</h2>
+          <div class="charts-grid">
+            <canvas id="statusChart" width="400" height="300" aria-label="مخطط حالات المهام" role="img"></canvas>
+            <canvas id="priorityChart" width="400" height="300" aria-label="مخطط أولويات المهام" role="img"></canvas>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app__footer">
+        <p>منصة إدارة المهام © <span id="currentYear"></span></p>
+      </footer>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="script.js" type="module"></script>
+  </body>
+</html>
